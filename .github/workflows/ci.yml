@@ -1,4 +1,3 @@
-# .github/workflows/ci.yml
 name: CI
 
 on: [push, pull_request]
@@ -6,20 +5,39 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: secret
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://postgres:secret@localhost:5432/postgres"
+
     strategy:
       matrix:
         project: [api, web]
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      # instala dependencias
-      - run: cd ${{ matrix.project }} && npm ci
-      # si existe script build lo ejecuta, si no, continúa
-      - run: |
+
+      - name: Install deps
+        run: cd ${{ matrix.project }} && npm ci
+
+      - name: Build
+        run: |
           cd ${{ matrix.project }}
-          if [ -f package.json ] && grep -q '"build"' package.json; then
+          if grep -q '"build"' package.json; then
             npm run build
           else
-            echo "Sin script build, ok por ahora"
+            echo "Sin script build, saltando…"
           fi
