@@ -5,22 +5,6 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: secret
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      DATABASE_URL: "postgresql://postgres:secret@localhost:5432/postgres"
-
     strategy:
       matrix:
         project: [api, web]
@@ -30,14 +14,16 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
 
-      - name: Install deps
+      # Instala dependencias
+      - name: Install
         run: cd ${{ matrix.project }} && npm ci
 
+      # Compila solo si existe script build
       - name: Build
         run: |
           cd ${{ matrix.project }}
           if grep -q '"build"' package.json; then
             npm run build
           else
-            echo "Sin script build, saltando…"
+            echo "Sin script build → paso"
           fi
