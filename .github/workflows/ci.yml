@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: [api, web]
+        project: [dela-platform/api, dela-platform/web]
 
     steps:
       - uses: actions/checkout@v4
