@@ -1,0 +1,25 @@
+# .github/workflows/ci.yml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      # instala dependencias
+      - run: cd ${{ matrix.project }} && npm ci
+      # si existe script build lo ejecuta, si no, continúa
+      - run: |
+          cd ${{ matrix.project }}
+          if [ -f package.json ] && grep -q '"build"' package.json; then
+            npm run build
+          else
+            echo "Sin script build, ok por ahora"
+          fi

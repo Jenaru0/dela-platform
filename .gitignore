@@ -1,0 +1,13 @@
+# dependencias
+node_modules/
+
+# salidas de compilación
+dist/
+.next/
+build/
+
+# variables de entorno
+*.env
+
+# otros
+.DS_Store
