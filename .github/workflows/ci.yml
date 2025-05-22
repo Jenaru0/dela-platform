@@ -3,27 +3,19 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  install-and-build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: [DELA-PLATFORM/api, DELA-PLATFORM/web]
+        project: [api, web]
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
 
-      # Instala dependencias
       - name: Install
         run: cd ${{ matrix.project }} && npm ci
 
-      # Compila solo si existe script build
       - name: Build
-        run: |
-          cd ${{ matrix.project }}
-          if grep -q '"build"' package.json; then
-            npm run build
-          else
-            echo "Sin script build → paso"
-          fi
+        run: cd ${{ matrix.project }} && npm run build
