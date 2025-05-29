@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
@@ -39,6 +40,7 @@ const Header: React.FC<HeaderProps> = ({
   
   const { isAuthenticated, usuario, cerrarSesion, isLoading } = useAuth();
   const { cart } = useCart();
+  const router = useRouter();
   const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
@@ -60,15 +62,45 @@ const Header: React.FC<HeaderProps> = ({
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, []);
-
-  const navigation = [
+  }, []);  const navigation = [
     { name: 'Inicio', href: '/' },
     { name: 'Productos', href: '/productos' },
-    { name: 'Categorías', href: '/categorias' },
+    { name: 'Categorías', href: '/#categorias', isScroll: true },
     { name: 'Nosotros', href: '/nosotros' },
     { name: 'Contacto', href: '/contacto' },
-  ];
+  ];  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, item: { name: string; href: string; isScroll?: boolean }) => {
+    if (item.isScroll && item.href === '/#categorias') {
+      e.preventDefault();
+      
+      // Si ya estamos en la página de inicio, hacer scroll directo
+      if (window.location.pathname === '/') {
+        const element = document.getElementById('categorias');
+        if (element) {
+          const headerHeight = 80;
+          const offsetTop = element.offsetTop - headerHeight + 10;
+          window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+          });
+        }
+      } else {
+        // Si estamos en otra página, navegar a inicio y después hacer scroll
+        router.push('/');
+        // Esperar a que la página cargue y luego hacer scroll
+        setTimeout(() => {
+          const element = document.getElementById('categorias');
+          if (element) {
+            const headerHeight = 80;
+            const offsetTop = element.offsetTop - headerHeight + 10;
+            window.scrollTo({
+              top: offsetTop,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -137,14 +169,13 @@ const Header: React.FC<HeaderProps> = ({
                   </span>
                 </h1>
               </div>
-            </Link>
-
-            {/* Desktop Navigation */}
+            </Link>            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item)}
                   className="text-gray-700 hover:text-[#CC9F53] font-medium transition-colors duration-200 relative group"
                 >
                   {item.name}
@@ -346,14 +377,16 @@ const Header: React.FC<HeaderProps> = ({
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="lg:hidden border-t border-[#E6D5A8] bg-white">
-            <div className="container mx-auto px-4 py-4">
-              <nav className="flex flex-col space-y-4">
+            <div className="container mx-auto px-4 py-4">              <nav className="flex flex-col space-y-4">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     className="text-gray-700 hover:text-[#CC9F53] font-medium py-2 border-b border-gray-100 transition-colors duration-200"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      handleNavClick(e, item);
+                      setIsMenuOpen(false);
+                    }}
                   >
                     {item.name}
                   </Link>
