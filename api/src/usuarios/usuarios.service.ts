@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { ActualizarPerfilDto } from './dto/actualizar-perfil.dto';
 
 @Injectable()
 export class UsuariosService {
@@ -53,6 +54,30 @@ export class UsuariosService {
     return this.prisma.usuario.update({
       where: { id },
       data: { eliminado: true },
+    });
+  }
+
+  async actualizarPerfil(id: number, dto: ActualizarPerfilDto) {
+    const usuario = await this.prisma.usuario.findFirst({
+      where: { AND: [{ id }, { eliminado: false }] },
+    });
+    if (!usuario) throw new NotFoundException('Usuario no encontrado');
+
+    // Si se está actualizando el email, verificar que no exista
+    if (dto.email && dto.email !== usuario.email) {
+      const emailExiste = await this.prisma.usuario.findUnique({
+        where: { email: dto.email },
+      });
+      if (emailExiste && emailExiste.id !== id) {
+        throw new ConflictException(
+          'El correo ya está registrado por otro usuario.',
+        );
+      }
+    }
+
+    return this.prisma.usuario.update({
+      where: { id },
+      data: dto,
     });
   }
 }

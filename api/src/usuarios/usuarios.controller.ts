@@ -13,6 +13,7 @@ import {
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { ActualizarPerfilDto } from './dto/actualizar-perfil.dto';
 import { JwtAutenticacionGuard } from '../autenticacion/guards/jwt-autenticacion.guard';
 
 @Controller('usuarios')
@@ -23,7 +24,7 @@ export class UsuariosController {
   @Post()
   @UseGuards(JwtAutenticacionGuard)
   async create(@Body() createUsuarioDto: CreateUsuarioDto, @Request() req) {
-    if (req.user.tipoUsuarioId !== 2) {
+    if (req.user.tipoUsuario !== 'ADMIN') {
       throw new ForbiddenException(
         'Solo administradores pueden crear usuarios.',
       );
@@ -39,7 +40,7 @@ export class UsuariosController {
   @UseGuards(JwtAutenticacionGuard)
   async findAll(@Request() req) {
     // Solo admin puede listar todos
-    if (req.user.tipoUsuarioId !== 2) {
+    if (req.user.tipoUsuario !== 'ADMIN') {
       throw new ForbiddenException(
         'Solo administradores pueden listar todos los usuarios.',
       );
@@ -61,12 +62,25 @@ export class UsuariosController {
     };
   }
 
+  @Patch('me')
+  @UseGuards(JwtAutenticacionGuard)
+  async updateProfile(@Body() dto: ActualizarPerfilDto, @Request() req) {
+    const usuario = await this.usuariosService.actualizarPerfil(
+      Number(req.user.sub),
+      dto,
+    );
+    return {
+      mensaje: 'Perfil actualizado correctamente.',
+      data: usuario,
+    };
+  }
+
   @Get(':id')
   @UseGuards(JwtAutenticacionGuard)
   async findOne(@Param('id') id: string, @Request() req) {
     const usuario = await this.usuariosService.findOne(+id);
     // Solo admin o el propio usuario puede ver
-    if (req.user.tipoUsuarioId !== 2 && req.user.sub !== usuario?.id) {
+    if (req.user.tipoUsuario !== 'ADMIN' && req.user.sub !== usuario?.id) {
       throw new ForbiddenException('No tienes permisos para ver este usuario.');
     }
     return {
@@ -83,7 +97,7 @@ export class UsuariosController {
     @Request() req,
   ) {
     // Solo admin o el propio usuario puede editar
-    if (req.user.tipoUsuarioId !== 2 && req.user.sub !== +id) {
+    if (req.user.tipoUsuario !== 'ADMIN' && req.user.sub !== +id) {
       throw new ForbiddenException(
         'No tienes permisos para editar este usuario.',
       );
@@ -99,7 +113,7 @@ export class UsuariosController {
   @UseGuards(JwtAutenticacionGuard)
   async remove(@Param('id') id: string, @Request() req) {
     // Solo admin o el propio usuario puede eliminar
-    if (req.user.tipoUsuarioId !== 2 && req.user.sub !== +id) {
+    if (req.user.tipoUsuario !== 'ADMIN' && req.user.sub !== +id) {
       throw new ForbiddenException(
         'No tienes permisos para eliminar este usuario.',
       );

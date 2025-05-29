@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegistroDto } from './dto/registro.dto';
 import { InicioSesionDto } from './dto/inicio-sesion.dto';
+import { CambiarContrasenaDto } from './dto/cambiar-contrasena.dto';
 import {
   RespuestaRegistro,
   RespuestaInicioSesion,
@@ -41,7 +42,7 @@ export class AutenticacionService {
         nombres: dto.nombres,
         apellidos: dto.apellidos,
         celular: dto.celular,
-        tipoUsuarioId: dto.tipoUsuarioId,
+        tipoUsuario: dto.tipoUsuario || 'CLIENTE',
       },
     });
 
@@ -60,7 +61,7 @@ export class AutenticacionService {
         email: usuario.email,
         nombres: usuario.nombres || '',
         apellidos: usuario.apellidos || '',
-        tipoUsuarioId: usuario.tipoUsuarioId,
+        tipoUsuario: usuario.tipoUsuario,
       },
     };
   }
@@ -97,7 +98,7 @@ export class AutenticacionService {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
-      tipoUsuarioId: usuario.tipoUsuarioId,
+      tipoUsuario: usuario.tipoUsuario,
     };
     const token = this.jwtService.sign(payload);
 
@@ -114,8 +115,62 @@ export class AutenticacionService {
         email: usuario.email,
         nombres: usuario.nombres || '',
         apellidos: usuario.apellidos || '',
-        tipoUsuarioId: usuario.tipoUsuarioId,
+        tipoUsuario: usuario.tipoUsuario,
       },
+    };
+  }
+
+  async cambiarContrasena(
+    usuarioId: number,
+    dto: CambiarContrasenaDto,
+  ): Promise<{ mensaje: string }> {
+    // Validar que las contraseñas coincidan
+    if (dto.nuevaContrasena !== dto.confirmarContrasena) {
+      throw new BadRequestException(
+        'La nueva contraseña y su confirmación no coinciden.',
+      );
+    }
+
+    // Validar que la nueva contraseña tenga al menos 6 caracteres
+    if (dto.nuevaContrasena.length < 6) {
+      throw new BadRequestException(
+        'La nueva contraseña debe tener al menos 6 caracteres.',
+      );
+    }
+
+    // Obtener el usuario y su contraseña actual
+    const usuario = await this.prisma.usuario.findUnique({
+      where: { id: usuarioId },
+      include: { auth: true },
+    });
+
+    if (!usuario || !usuario.auth) {
+      throw new UnauthorizedException(
+        'Usuario no encontrado o sin datos de autenticación.',
+      );
+    }
+
+    // Verificar que la contraseña actual sea correcta
+    const contrasenaValida = await bcrypt.compare(
+      dto.contrasenaActual,
+      usuario.auth.contrasena,
+    );
+
+    if (!contrasenaValida) {
+      throw new UnauthorizedException('La contraseña actual es incorrecta.');
+    }
+
+    // Hash de la nueva contraseña
+    const nuevaContrasenaHash = await bcrypt.hash(dto.nuevaContrasena, 12);
+
+    // Actualizar la contraseña en la base de datos
+    await this.prisma.usuarioAuth.update({
+      where: { usuarioId: usuarioId },
+      data: { contrasena: nuevaContrasenaHash },
+    });
+
+    return {
+      mensaje: 'Contraseña cambiada exitosamente.',
     };
   }
 }

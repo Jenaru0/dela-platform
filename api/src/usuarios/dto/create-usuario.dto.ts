@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, IsInt } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsEnum } from 'class-validator';
 
 export class CreateUsuarioDto {
   @IsEmail()
@@ -16,6 +16,9 @@ export class CreateUsuarioDto {
   @IsString()
   celular?: string;
 
-  @IsInt()
-  tipoUsuarioId: number;
+  @IsOptional()
+  @IsEnum(['CLIENTE', 'ADMIN'], {
+    message: 'El tipo de usuario debe ser CLIENTE o ADMIN.',
+  })
+  tipoUsuario?: 'CLIENTE' | 'ADMIN';
 }

@@ -1,5 +1,5 @@
 export interface JwtPayload {
   sub: number;
   email: string;
-  tipoUsuarioId: number;
+  tipoUsuario: 'CLIENTE' | 'ADMIN';
 }

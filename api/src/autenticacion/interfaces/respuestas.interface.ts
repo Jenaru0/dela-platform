@@ -3,7 +3,7 @@ export interface UsuarioResponse {
   email: string;
   nombres: string;
   apellidos: string;
-  tipoUsuarioId: number;
+  tipoUsuario: 'CLIENTE' | 'ADMIN';
 }
 
 export interface RespuestaRegistro {

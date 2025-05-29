@@ -4,7 +4,7 @@ export interface Usuario {
   nombres?: string;
   apellidos?: string;
   celular?: string;
-  tipoUsuarioId: number;
+  tipoUsuario: 'CLIENTE' | 'ADMIN';
   eliminado: boolean;
   creadoEn: Date;
   actualizadoEn: Date;

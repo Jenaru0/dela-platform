@@ -7,13 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TipoUsuario {
-  id          Int       @id @default(autoincrement())
-  nombre      String    @db.VarChar(50)
-  descripcion String?
-  usuarios    Usuario[]
-
-  @@map("tipo_usuario")
+enum TipoUsuario {
+  CLIENTE
+  ADMIN
 }
 
 model Usuario {
@@ -22,7 +18,7 @@ model Usuario {
   apellidos          String?                  @db.VarChar(100)
   email              String                   @unique @db.VarChar(150)
   celular            String?                  @db.VarChar(15)
-  tipoUsuarioId      Int
+  tipoUsuario        TipoUsuario              @default(CLIENTE)
   creadoEn           DateTime                 @default(now()) @db.Timestamp(6)
   actualizadoEn      DateTime                 @updatedAt @db.Timestamp(6)
   auditorias         Auditoria[]
@@ -34,7 +30,6 @@ model Usuario {
   reclamos           Reclamo[]
   recuperaciones     RecuperacionContrasena[]
   reviews            Review[]
-  tipoUsuario        TipoUsuario              @relation(fields: [tipoUsuarioId], references: [id])
   auth               UsuarioAuth?
   eliminado          Boolean                   @default(false)
 
