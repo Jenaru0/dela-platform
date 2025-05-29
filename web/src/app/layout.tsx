@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import './globals.css';
-import { CartProvider } from '@/context/CarContext';
-import { CartDrawerProvider } from '@/context/CartDrawerContext';
+import { CartProvider } from '@/contexts/CarContext';
+import { CartDrawerProvider } from '@/contexts/CartDrawerContext';
 import { MiniCartDrawer } from '@/components/carrito/carritoDrawer/MiniCartDrawer';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });

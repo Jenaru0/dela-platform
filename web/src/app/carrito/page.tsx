@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import { Lock, ShoppingBag } from 'lucide-react';
-import { useCart } from '@/context/CarContext';
+import { useCart } from '@/contexts/CarContext';
 import { CartProductItem } from '@/components/carrito/CartProductItem';
 import { CartSummary } from '@/components/carrito/CartSummary';
 import { CartEmpty } from '@/components/carrito/CartEmpty';

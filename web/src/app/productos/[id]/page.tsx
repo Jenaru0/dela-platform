@@ -1,8 +1,8 @@
 'use client';
 import { useParams, useRouter } from 'next/navigation';
 import { products } from '@/lib/products';
-import { useCart } from '@/context/CarContext';
-import { useCartDrawer } from '@/context/CartDrawerContext';
+import { useCart } from '@/contexts/CarContext';
+import { useCartDrawer } from '@/contexts/CartDrawerContext';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import Layout from '@/components/layout/Layout';

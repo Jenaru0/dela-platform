@@ -3,7 +3,7 @@ import React from "react";
 import Image from "next/image";
 import { Trash, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import type { CartItem } from "@/context/CarContext";
+import type { CartItem } from "@/contexts/CarContext";
 
 interface Props {
   prod: CartItem;

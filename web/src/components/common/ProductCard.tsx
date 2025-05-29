@@ -1,8 +1,8 @@
 'use client';
 
-import { useCart } from '@/context/CarContext';
+import { useCart } from '@/contexts/CarContext';
 import { useRouter } from 'next/navigation';
-import { useCartDrawer } from '@/context/CartDrawerContext';
+import { useCartDrawer } from '@/contexts/CartDrawerContext';
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';

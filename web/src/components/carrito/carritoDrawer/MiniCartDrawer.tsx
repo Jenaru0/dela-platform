@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef } from "react";
-import { useCart } from "@/context/CarContext";
-import { useCartDrawer } from "@/context/CartDrawerContext";
+import { useCart } from "@/contexts/CarContext";
+import { useCartDrawer } from "@/contexts/CartDrawerContext";
 import DrawerFooter from "./DrawerFooter";
 import DrawerHeader from "./DrawerHeader";
 import CartDrawerProductItem from "./CartDrawerProductItem";
