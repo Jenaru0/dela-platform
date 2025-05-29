@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
-import { useCart } from '@/context/CarContext';
+import { useCart } from '@/contexts/CarContext';
 import {
   Menu,
   X,

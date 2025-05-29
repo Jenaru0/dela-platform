@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['dela.com.pe', 'unsplash.com', 'picsum.photos'],
+    domains: ['dela.com.pe', 'unsplash.com', 'picsum.photos', 'cdn-icons-png.flaticon.com'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn-icons-png.flaticon.com',
+        port: '',
+        pathname: '/512/**',
       },
     ],
   },
