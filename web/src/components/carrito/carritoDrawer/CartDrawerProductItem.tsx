@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { Trash, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { CartItem } from "@/context/CarContext";
@@ -18,13 +19,13 @@ const CartDrawerProductItem: React.FC<Props> = ({
   decreaseQty,
   setQty,
   removeFromCart,
-}) => (
-  <div className="flex items-center rounded-2xl border border-[#F6E9C2]/80 bg-white shadow-lg shadow-[#cc9f5326] p-3 sm:p-4 gap-3">
-    <img
+}) => (  <div className="flex items-center rounded-2xl border border-[#F6E9C2]/80 bg-white shadow-lg shadow-[#cc9f5326] p-3 sm:p-4 gap-3">
+    <Image
       src={prod.image}
       alt={prod.name}
       className="w-14 h-14 object-contain rounded-xl border border-[#f7ecd8] bg-[#FFF9EC] shadow-inner"
-      loading="lazy"
+      width={56}
+      height={56}
     />
     <div className="flex-1 min-w-0">
       <div className="font-bold text-sm sm:text-base text-[#3A3A3A] truncate">

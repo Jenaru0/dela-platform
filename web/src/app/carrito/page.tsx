@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import { Lock, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CarContext';
@@ -33,17 +34,16 @@ export default function CarritoPage() {
           </h1>
 
           {/* CTA para seguir comprando */}
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-2 mt-3 text-[#9A8C61] bg-[#F7ECD8] px-4 py-3 rounded-xl text-sm shadow">
+          <div className="mb-6 flex items-center justify-between">            <div className="flex items-center gap-2 mt-3 text-[#9A8C61] bg-[#F7ECD8] px-4 py-3 rounded-xl text-sm shadow">
               <Lock className="w-4 h-4" />
               Compra protegida y datos seguros con DELA
             </div>
-            <a
+            <Link
               href="/productos"
               className="text-[#B88D42] font-semibold hover:underline transition"
             >
               + Seguir comprando
-            </a>
+            </Link>
           </div>
 
           {cart.length === 0 ? (
