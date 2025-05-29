@@ -1,5 +1,8 @@
 'use client';
 
+import { useCart } from '@/context/CarContext';
+import { useRouter } from 'next/navigation';
+import { useCartDrawer } from '@/context/CartDrawerContext';
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -29,6 +32,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
       )
     : 0;
 
+  const { addToCart } = useCart();
+  const { openDrawer } = useCartDrawer();
+
+  // Puedes hacer aquí una función handleAddToCart si prefieres:
+  const handleAddToCart = () => {
+    addToCart(product);
+    openDrawer();
+  };
+
+  const router = useRouter();
+
+  const handleQuickView = () => {
+    router.push(`/productos/${product.id}`);
+  };
+
   return (
     <Card
       className={`group relative overflow-hidden transition-all duration-500 hover:scale-[1.03] hover:shadow-xl hover:shadow-[#CC9F53]/10 border-[#E6D5A8]/30 hover:border-[#CC9F53]/40 bg-white ${className}`}
@@ -43,9 +61,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           alt={product.name}
           fill
           className="object-contain p-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-1"
-          onError={(e) => {
-            e.currentTarget.src = '/images/product-fallback.svg';
-          }}
         />
 
         {/* Enhanced discount badge with DELA colors */}
@@ -71,7 +86,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             }
           >
             <Heart
-              className={`h-4 w-4 transition-all ${isFavorite ? 'fill-current scale-110' : ''}`}
+              className={`h-4 w-4 transition-all ${
+                isFavorite ? 'fill-current scale-110' : ''
+              }`}
             />
           </Button>
         )}
@@ -87,6 +104,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             variant="ghost"
             size="sm"
             className="bg-white/95 text-[#CC9F53] hover:bg-[#CC9F53] hover:text-white transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-lg font-medium"
+            onClick={handleQuickView}
           >
             Vista rápida
           </Button>
@@ -122,11 +140,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
       </CardContent>
 
       <CardFooter className="p-6 pt-0 space-y-3">
-        {' '}
         {/* Enhanced CTA button with DELA styling */}
         <Button
           className="w-full bg-[#CC9F53] hover:bg-[#CC9F53]/90 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:shadow-[#CC9F53]/20 transition-all duration-300 transform hover:scale-[1.02] group/btn"
           size="default"
+          onClick={handleAddToCart}
         >
           <ShoppingBag className="mr-2 h-5 w-5 transition-transform group-hover/btn:scale-110" />
           Añadir al carrito

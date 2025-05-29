@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
+import { useCart } from '@/context/CarContext';
 import {
   Menu,
   X,
@@ -24,12 +25,10 @@ import {
 } from 'lucide-react';
 
 interface HeaderProps {
-  cartItemsCount?: number;
   wishlistCount?: number;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  cartItemsCount = 0,
   wishlistCount = 0,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,6 +38,8 @@ const Header: React.FC<HeaderProps> = ({
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');  const [showUserMenu, setShowUserMenu] = useState(false);
   
   const { isAuthenticated, usuario, cerrarSesion, isLoading } = useAuth();
+  const { cart } = useCart();
+  const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -179,20 +180,20 @@ const Header: React.FC<HeaderProps> = ({
                     {wishlistCount}
                   </Badge>
                 )}
-              </Button>
-
-              {/* Cart */}
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {cartItemsCount > 0 && (
-                  <Badge
-                    variant="default"
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#CC9F53] hover:bg-[#B88D42]"
-                  >
-                    {cartItemsCount}
-                  </Badge>
-                )}
-              </Button>              {/* User Account */}
+              </Button>              {/* Cart */}
+              <Link href="/carrito">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemsCount > 0 && (
+                    <Badge
+                      variant="default"
+                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#CC9F53] hover:bg-[#B88D42]"
+                    >
+                      {cartItemsCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>{/* User Account */}
               {isLoading ? (
                 // Skeleton que replica exactamente el layout de los botones originales
                 <div className="flex items-center space-x-2">
