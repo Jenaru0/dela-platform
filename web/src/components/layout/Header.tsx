@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCart } from '@/contexts/CarContext';
+import { useFavorites } from '@/contexts/FavoritoContext';
 import {
   Menu,
   X,
@@ -25,22 +26,19 @@ import {
   Users,
 } from 'lucide-react';
 
-interface HeaderProps {
-  wishlistCount?: number;
-}
-
-const Header: React.FC<HeaderProps> = ({
-  wishlistCount = 0,
-}) => {
+const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');  const [showUserMenu, setShowUserMenu] = useState(false);
-  
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
   const { isAuthenticated, usuario, cerrarSesion, isLoading } = useAuth();
   const { cart } = useCart();
+  const { favorites } = useFavorites();
   const router = useRouter();
+
   const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
@@ -57,45 +55,42 @@ const Header: React.FC<HeaderProps> = ({
 
     window.addEventListener('scroll', handleScroll);
     document.addEventListener('click', handleClickOutside);
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, []);  const navigation = [
+  }, []);
+
+  const navigation = [
     { name: 'Inicio', href: '/' },
     { name: 'Productos', href: '/productos' },
     { name: 'Categorías', href: '/#categorias', isScroll: true },
     { name: 'Nosotros', href: '/nosotros' },
     { name: 'Contacto', href: '/contacto' },
-  ];  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, item: { name: string; href: string; isScroll?: boolean }) => {
+  ];
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    item: { name: string; href: string; isScroll?: boolean }
+  ) => {
     if (item.isScroll && item.href === '/#categorias') {
       e.preventDefault();
-      
-      // Si ya estamos en la página de inicio, hacer scroll directo
       if (window.location.pathname === '/') {
         const element = document.getElementById('categorias');
         if (element) {
           const headerHeight = 80;
           const offsetTop = element.offsetTop - headerHeight + 10;
-          window.scrollTo({
-            top: offsetTop,
-            behavior: 'smooth'
-          });
+          window.scrollTo({ top: offsetTop, behavior: 'smooth' });
         }
       } else {
-        // Si estamos en otra página, navegar a inicio y después hacer scroll
         router.push('/');
-        // Esperar a que la página cargue y luego hacer scroll
         setTimeout(() => {
           const element = document.getElementById('categorias');
           if (element) {
             const headerHeight = 80;
             const offsetTop = element.offsetTop - headerHeight + 10;
-            window.scrollTo({
-              top: offsetTop,
-              behavior: 'smooth'
-            });
+            window.scrollTo({ top: offsetTop, behavior: 'smooth' });
           }
         }, 100);
       }
@@ -108,14 +103,17 @@ const Header: React.FC<HeaderProps> = ({
       setShowUserMenu(false);
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
-    }  };  const userMenuItems = [
+    }
+  };
+
+  const userMenuItems = [
     { icon: User, label: 'Mi Perfil', href: '/perfil' },
     { icon: ShoppingBag, label: 'Mis Pedidos', href: '/pedidos' },
     { icon: Heart, label: 'Lista de Deseos', href: '/wishlist' },
     { icon: Settings, label: 'Configuración', href: '/configuracion' },
-    ...(usuario?.tipoUsuario === 'ADMIN' ? [
-      { icon: Users, label: 'Gestión de Usuarios', href: '/usuarios' }
-    ] : [])
+    ...(usuario?.tipoUsuario === 'ADMIN'
+      ? [{ icon: Users, label: 'Gestión de Usuarios', href: '/usuarios' }]
+      : []),
   ];
 
   return (
@@ -149,7 +147,8 @@ const Header: React.FC<HeaderProps> = ({
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}            <Link href="/" className="flex items-center space-x-3">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-3">
               <div className="relative h-10 w-10 md:h-12 md:w-12">
                 <Image
                   src="https://dela.com.pe/img/lodo-dela-header.png"
@@ -157,7 +156,7 @@ const Header: React.FC<HeaderProps> = ({
                   fill
                   className="object-contain"
                   onError={(e) => {
-                    e.currentTarget.src = '/images/logo.svg';
+                    (e.target as HTMLImageElement).src = '/images/logo-fallback.png';
                   }}
                 />
               </div>
@@ -169,7 +168,9 @@ const Header: React.FC<HeaderProps> = ({
                   </span>
                 </h1>
               </div>
-            </Link>            {/* Desktop Navigation */}
+            </Link>
+
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
               {navigation.map((item) => (
                 <Link
@@ -200,20 +201,19 @@ const Header: React.FC<HeaderProps> = ({
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-2 md:space-x-4">
-              {/* Wishlist */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                  >
-                    {wishlistCount}
-                  </Badge>
+              {/* Favoritos */}
+              <Link href="/favoritos" className="relative">
+                <Heart className="w-6 h-6" />
+                {favorites.length > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-[#CC9F53] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    {favorites.length}
+                  </span>
                 )}
-              </Button>              {/* Cart */}
+              </Link>
+
+              {/* Carrito */}
               <Link href="/carrito">
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className="relative cursor-pointer">
                   <ShoppingCart className="h-5 w-5" />
                   {cartItemsCount > 0 && (
                     <Badge
@@ -224,11 +224,11 @@ const Header: React.FC<HeaderProps> = ({
                     </Badge>
                   )}
                 </Button>
-              </Link>{/* User Account */}
+              </Link>
+
+              {/* Usuario / Autenticación */}
               {isLoading ? (
-                // Skeleton que replica exactamente el layout de los botones originales
                 <div className="flex items-center space-x-2">
-                  {/* Skeleton para botones desktop - coincide con h-9 px-3 del Button size="sm" */}
                   <div className="hidden md:flex items-center space-x-2">
                     <div className="h-9 px-3 bg-gray-200 rounded-md animate-pulse text-xs">
                       <span className="invisible">Iniciar Sesión</span>
@@ -237,7 +237,6 @@ const Header: React.FC<HeaderProps> = ({
                       <span className="invisible">Registrarse</span>
                     </div>
                   </div>
-                  {/* Skeleton para botón mobile - coincide con size="icon" h-10 w-10 */}
                   <div className="w-10 h-10 bg-gray-200 rounded-md animate-pulse md:hidden"></div>
                 </div>
               ) : isAuthenticated ? (
@@ -250,17 +249,16 @@ const Header: React.FC<HeaderProps> = ({
                     <div className="flex items-center justify-center w-8 h-8 bg-[#CC9F53] text-white rounded-full text-sm font-medium">
                       {usuario?.nombres?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
-                    <ChevronDown 
+                    <ChevronDown
                       className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
                         showUserMenu ? 'rotate-180' : ''
-                      }`} 
+                      }`}
                     />
                   </Button>
 
-                  {/* User Dropdown Menu */}
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-[#E6D5A8] py-2 z-50">
-                      {/* User Info Header */}
+                      {/* Información de usuario */}
                       <div className="px-4 py-3 border-b border-[#E6D5A8]">
                         <div className="flex items-center space-x-3">
                           <div className="flex-none w-10 h-10 bg-[#CC9F53] text-white rounded-full flex items-center justify-center font-bold select-none">
@@ -270,14 +268,12 @@ const Header: React.FC<HeaderProps> = ({
                             <p className="text-sm font-medium text-[#3A3A3A]">
                               {usuario?.nombres} {usuario?.apellidos}
                             </p>
-                            <p className="text-xs text-gray-500">
-                              {usuario?.email}
-                            </p>
+                            <p className="text-xs text-gray-500">{usuario?.email}</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Menu Items */}
+                      {/* Opciones */}
                       <div className="py-1">
                         {userMenuItems.map((item, index) => (
                           <Link
@@ -292,7 +288,7 @@ const Header: React.FC<HeaderProps> = ({
                         ))}
                       </div>
 
-                      {/* Logout */}
+                      {/* Cerrar sesión */}
                       <div className="border-t border-[#E6D5A8] mt-1 pt-1">
                         <button
                           onClick={handleLogout}
@@ -307,8 +303,8 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={() => {
                       setAuthModalMode('login');
@@ -318,8 +314,8 @@ const Header: React.FC<HeaderProps> = ({
                   >
                     Iniciar Sesión
                   </Button>
-                  <Button 
-                    variant="default" 
+                  <Button
+                    variant="default"
                     size="sm"
                     onClick={() => {
                       setAuthModalMode('register');
@@ -329,8 +325,8 @@ const Header: React.FC<HeaderProps> = ({
                   >
                     Registrarse
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="icon"
                     onClick={() => {
                       setAuthModalMode('login');
@@ -343,23 +339,19 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Botón menú móvil */}
               <Button
                 variant="ghost"
                 size="icon"
                 className="lg:hidden"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                {isMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
             </div>
           </div>
 
-          {/* Mobile Search */}
+          {/* Búsqueda móvil */}
           <div className="md:hidden pb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -374,27 +366,25 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Menú móvil desplegable */}
         {isMenuOpen && (
           <div className="lg:hidden border-t border-[#E6D5A8] bg-white">
-            <div className="container mx-auto px-4 py-4">              <nav className="flex flex-col space-y-4">
+            <div className="container mx-auto px-4 py-4">
+              <nav className="flex flex-col space-y-4">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="text-gray-700 hover:text-[#CC9F53] font-medium py-2 border-b border-gray-100 transition-colors duration-200"
                     onClick={(e) => {
                       handleNavClick(e, item);
                       setIsMenuOpen(false);
                     }}
+                    className="text-gray-700 hover:text-[#CC9F53] font-medium py-2 border-b border-gray-100 transition-colors duration-200"
                   >
                     {item.name}
                   </Link>
                 ))}
-                  {/* Aquí antes estaban los botones de Iniciar Sesión y Registrarse para mobile
-                    Se eliminaron para evitar duplicación ya que se usa el icono de usuario
-                    en la parte superior para mostrar estos botones */}
-                  {/* User info for mobile */}
+
                 {!isLoading && isAuthenticated && usuario && (
                   <div className="pt-4 border-t border-gray-100">
                     <div className="flex items-center space-x-3 p-3 bg-[#F5EFD7]/60 rounded-lg mb-3">
@@ -405,17 +395,14 @@ const Header: React.FC<HeaderProps> = ({
                         <p className="text-sm font-medium text-[#3A3A3A]">
                           {usuario.nombres} {usuario.apellidos}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          {usuario.email}
-                        </p>
+                        <p className="text-xs text-gray-500">{usuario.email}</p>
                       </div>
                     </div>
-                    
-                    {/* Mobile user menu items */}
+
                     <div className="space-y-1">
-                      {userMenuItems.map((item, index) => (
+                      {userMenuItems.map((item, idx) => (
                         <Link
-                          key={index}
+                          key={idx}
                           href={item.href}
                           onClick={() => setIsMenuOpen(false)}
                           className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-[#F5EFD7]/60 hover:text-[#CC9F53] transition-colors duration-200 rounded-lg"
@@ -440,8 +427,8 @@ const Header: React.FC<HeaderProps> = ({
         )}
       </header>
 
-      {/* Auth Modal */}
-      <AuthModal 
+      {/* Modal de autenticación */}
+      <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode={authModalMode}

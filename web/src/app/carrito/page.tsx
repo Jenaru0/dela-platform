@@ -9,7 +9,6 @@ import { CartProductItem } from '@/components/carrito/CartProductItem';
 import { CartSummary } from '@/components/carrito/CartSummary';
 import { CartEmpty } from '@/components/carrito/CartEmpty';
 import { Button } from '@/components/ui/Button';
-
 export default function CarritoPage() {
   const {
     cart,
