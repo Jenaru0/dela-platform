@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductosController } from './productos.controller';
 import { ProductosService } from './productos.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('ProductosController', () => {
   let controller: ProductosController;
@@ -8,21 +9,7 @@ describe('ProductosController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductosController],
-      providers: [
-        {
-          provide: ProductosService,
-          useValue: {
-            findAllWithFilters: jest.fn(),
-            findAll: jest.fn(),
-            findDestacados: jest.fn(),
-            buscarProductos: jest.fn(),
-            findCategorias: jest.fn(),
-            findOne: jest.fn(),
-            findBySlug: jest.fn(),
-            findByCategoria: jest.fn(),
-          },
-        },
-      ],
+      providers: [ProductosService, PrismaService]
     }).compile();
 
     controller = module.get<ProductosController>(ProductosController);
