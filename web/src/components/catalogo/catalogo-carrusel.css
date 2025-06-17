@@ -1,40 +1,58 @@
 .custom-swiper-arrow {
-  width: 44px;
-  height: 44px;
-  background: rgba(255,255,255,0.95);
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #fff9ec 60%, #f5efd7 100%);
   border-radius: 50%;
-  box-shadow: 0 2px 8px 0 #e7d7b6a0;
+  box-shadow: 0 4px 16px 0 #e7d7b6a0;
   color: #CC9F53;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  transition: background 0.2s, box-shadow 0.2s;
-  border: 2px solid #f5efd7;
+  font-size: 1.2rem;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
+  border: 1.5px solid #e7d7b6;
+  cursor: pointer;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
 }
-.custom-swiper-arrow:after {
-  font-size: 1.6rem;
-  color: #CC9F53;
+.swiper:hover .custom-swiper-arrow {
+  opacity: 1;
+  pointer-events: auto;
 }
-.swiper-button-next:after {
-  content: '\2192';
+.swiper-button-prev.custom-swiper-arrow {
+  left: -24px;
 }
-.swiper-button-prev:after {
-  content: '\2190';
+.swiper-button-next.custom-swiper-arrow {
+  right: -24px;
+}
+.custom-swiper-arrow svg {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 2px 4px #e7d7b6a0);
+  transition: transform 0.2s, filter 0.2s;
 }
 .custom-swiper-arrow:hover {
-  background: #FFF9EC;
-  box-shadow: 0 4px 16px 0 #cc9f5340;
+  background: linear-gradient(135deg, #fff9ec 80%, #CC9F53 100%);
+  box-shadow: 0 8px 24px 0 #cc9f5340;
+  transform: scale(1.12);
+}
+.custom-swiper-arrow:hover svg {
+  filter: drop-shadow(0 4px 8px #cc9f5340);
+  transform: translateX(2px) scale(1.08);
 }
 .custom-swiper-pagination {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
   margin-top: 1.5rem;
 }
 .custom-swiper-pagination .swiper-pagination-bullet {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background: #e7d7b6;
   opacity: 1;
   border-radius: 50%;
@@ -43,6 +61,6 @@
 }
 .custom-swiper-pagination .swiper-pagination-bullet-active {
   background: #CC9F53;
-  transform: scale(1.2);
+  transform: scale(1.25);
   border-color: #CC9F53;
 }
